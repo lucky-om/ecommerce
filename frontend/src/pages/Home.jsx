@@ -110,7 +110,7 @@ const Home = () => {
       <div className="min-h-screen bg-bg-primary flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-neon-cyan border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-text-secondary">Loading Experience...</p>
+          <p className="text-text-secondary text-sm sm:text-base">Loading Experience...</p>
         </div>
       </div>
     );
@@ -123,9 +123,9 @@ const Home = () => {
       <ProductGrid products={products} onAddToCart={handleAddToCart} />
 
       {/* Features Section */}
-      <section className="bg-gradient-to-b from-bg-primary to-bg-secondary py-20 px-6">
+      <section className="bg-gradient-to-b from-bg-primary to-bg-secondary py-12 sm:py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {[
               { icon: '⚡', title: 'Ultra-Low Latency', desc: 'Experience gaming without delay' },
               { icon: '🔋', title: 'Extended Battery', desc: 'Days of uninterrupted listening' },
@@ -134,12 +134,12 @@ const Home = () => {
             ].map((feature, idx) => (
               <div
                 key={idx}
-                className="glass glass-hover rounded-2xl p-8 text-center space-y-4 slide-in"
+                className="glass glass-hover rounded-2xl p-4 sm:p-8 text-center space-y-3 sm:space-y-4 slide-in"
                 style={{ animationDelay: `${idx * 0.1}s` }}
               >
-                <div className="text-5xl">{feature.icon}</div>
-                <h3 className="text-xl font-bold text-text-primary">{feature.title}</h3>
-                <p className="text-text-tertiary">{feature.desc}</p>
+                <div className="text-4xl sm:text-5xl">{feature.icon}</div>
+                <h3 className="text-base sm:text-xl font-bold text-text-primary">{feature.title}</h3>
+                <p className="text-xs sm:text-base text-text-tertiary">{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -147,18 +147,18 @@ const Home = () => {
       </section>
 
       {/* Footer CTA */}
-      <section className="bg-gradient-to-r from-neon-cyan/10 via-neon-purple/10 to-neon-pink/10 py-20 px-6">
-        <div className="max-w-7xl mx-auto text-center space-y-8">
-          <h2 className="text-5xl font-bold text-text-primary">
+      <section className="bg-gradient-to-r from-neon-cyan/10 via-neon-purple/10 to-neon-pink/10 py-12 sm:py-20 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto text-center space-y-6 sm:space-y-8">
+          <h2 className="text-2xl sm:text-5xl font-bold text-text-primary">
             Ready to Experience
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink block">
               Premium Audio?
             </span>
           </h2>
-          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+          <p className="text-text-secondary text-sm sm:text-lg max-w-2xl mx-auto">
             Join thousands of audiophiles who have upgraded their listening experience with our flagship headphones.
           </p>
-          <button className="group relative px-10 py-4 text-white font-bold rounded-lg overflow-hidden transition-all hover:scale-105">
+          <button className="group relative px-6 sm:px-10 py-3 sm:py-4 text-white font-bold rounded-lg overflow-hidden transition-all hover:scale-105 active:scale-95 text-sm sm:text-base">
             <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan to-neon-purple"></div>
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{
               boxShadow: '0 0 30px rgba(0, 217, 255, 0.6)',
@@ -169,9 +169,9 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-bg-secondary border-t border-border-dark py-12 px-6">
+      <footer className="bg-bg-secondary border-t border-border-dark py-8 sm:py-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
             {[
               { title: 'Products', items: ['Headphones', 'Earbuds', 'Accessories'] },
               { title: 'Support', items: ['Help Center', 'Warranty', 'Returns'] },
@@ -179,11 +179,11 @@ const Home = () => {
               { title: 'Legal', items: ['Privacy', 'Terms', 'Cookies'] },
             ].map((col, idx) => (
               <div key={idx}>
-                <h4 className="font-bold text-text-primary mb-4">{col.title}</h4>
+                <h4 className="font-bold text-text-primary mb-3 sm:mb-4 text-sm sm:text-base">{col.title}</h4>
                 <ul className="space-y-2">
                   {col.items.map((item, i) => (
                     <li key={i}>
-                      <a href="#" className="text-text-tertiary hover:text-neon-cyan transition-colors text-sm">
+                      <a href="#" className="text-text-tertiary hover:text-neon-cyan transition-colors text-xs sm:text-sm">
                         {item}
                       </a>
                     </li>
@@ -192,11 +192,11 @@ const Home = () => {
               </div>
             ))}
           </div>
-          <div className="border-t border-border-dark pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-text-tertiary text-sm">&copy; 2024 SonicX. All rights reserved.</p>
+          <div className="border-t border-border-dark pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+            <p className="text-text-tertiary text-xs sm:text-sm text-center sm:text-left">&copy; 2024 SonicX. All rights reserved.</p>
             <div className="flex gap-4">
               {['Twitter', 'Instagram', 'Discord'].map((social, idx) => (
-                <a key={idx} href="#" className="text-text-tertiary hover:text-neon-cyan transition-colors text-sm">
+                <a key={idx} href="#" className="text-text-tertiary hover:text-neon-cyan transition-colors text-xs sm:text-sm">
                   {social}
                 </a>
               ))}
