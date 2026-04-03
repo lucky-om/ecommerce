@@ -39,16 +39,16 @@ export default function Navbar() {
           <div className="nav-actions">
             {user ? (
               <>
-                <Link href="/orders" className="btn btn-ghost btn-sm">My Orders</Link>
+                <Link href="/orders" className="btn btn-ghost btn-sm desktop-only">My Orders</Link>
                 {user.user_metadata?.role === 'admin' && (
-                  <Link href="/admin" className="btn btn-ghost btn-sm">Admin</Link>
+                  <Link href="/admin" className="btn btn-ghost btn-sm desktop-only">Admin</Link>
                 )}
-                <a href="/auth/logout" className="btn btn-ghost btn-sm">Logout</a>
+                <a href="/auth/logout" className="btn btn-ghost btn-sm desktop-only">Logout</a>
               </>
             ) : (
               <>
-                <Link href="/auth/login" className="btn btn-ghost btn-sm">Login</Link>
-                <Link href="/auth/signup" className="btn btn-primary btn-sm">Sign Up</Link>
+                <Link href="/auth/login" className="btn btn-ghost btn-sm desktop-only">Login</Link>
+                <Link href="/auth/signup" className="btn btn-primary btn-sm desktop-only">Sign Up</Link>
               </>
             )}
             <button className="nav-cart-btn" onClick={() => setCartOpen(true)} id="open-cart-btn">
@@ -61,10 +61,25 @@ export default function Navbar() {
         </div>
 
         {menuOpen && (
-          <div style={{ borderTop: '1px solid var(--border)', padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div style={{ borderTop: '1px solid var(--border)', padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', background: 'var(--bg-card)' }}>
             {links.map(l => (
               <Link key={l.href} href={l.href} className="nav-link" onClick={() => setMenuOpen(false)}>{l.label}</Link>
             ))}
+            <div style={{ height: '1px', background: 'var(--border)', margin: '0.5rem 0' }} />
+            {user ? (
+              <>
+                 <Link href="/orders" className="btn btn-ghost btn-sm" onClick={() => setMenuOpen(false)}>My Orders</Link>
+                 {user.user_metadata?.role === 'admin' && (
+                    <Link href="/admin" className="btn btn-ghost btn-sm" onClick={() => setMenuOpen(false)}>Admin</Link>
+                 )}
+                 <a href="/auth/logout" className="btn btn-danger btn-sm" onClick={() => setMenuOpen(false)}>Logout</a>
+              </>
+            ) : (
+              <>
+                 <Link href="/auth/login" className="btn btn-ghost btn-sm" onClick={() => setMenuOpen(false)}>Login</Link>
+                 <Link href="/auth/signup" className="btn btn-primary btn-sm" onClick={() => setMenuOpen(false)}>Sign Up</Link>
+              </>
+            )}
           </div>
         )}
       </nav>
