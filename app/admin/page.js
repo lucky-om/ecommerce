@@ -4,35 +4,39 @@ import { CATEGORIES, formatPrice } from '@/lib/data';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
-const MOCK_REVENUE = [
-  { month: 'Oct', rev: 48000 },
-  { month: 'Nov', rev: 72000 },
-  { month: 'Dec', rev: 95000 },
-  { month: 'Jan', rev: 63000 },
-  { month: 'Feb', rev: 88000 },
-  { month: 'Mar', rev: 114000 },
-];
-const maxRev = Math.max(...MOCK_REVENUE.map(r => r.rev));
-
 export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [allOrders, setAllOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       supabase.from('products').select('*'),
-      supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(5)
+      supabase.from('orders').select('*').order('created_at', { ascending: false })
     ]).then(([prodRes, ordRes]) => {
       if (prodRes.data) setProducts(prodRes.data);
-      if (ordRes.data) setOrders(ordRes.data);
+      if (ordRes.data) {
+        setAllOrders(ordRes.data);
+        setOrders(ordRes.data.slice(0, 5));
+      }
       setLoading(false);
     });
   }, []);
 
-  const totalRevenue = MOCK_REVENUE.reduce((sum, r) => sum + r.rev, 0) + orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
+  const monthlyRevenue = allOrders.reduce((acc, order) => {
+    const month = new Date(order.created_at).toLocaleString('default', { month: 'short' });
+    acc[month] = (acc[month] || 0) + (order.total_amount || 0);
+    return acc;
+  }, {});
+
+  const revenueData = Object.entries(monthlyRevenue).map(([month, rev]) => ({ month, rev })).reverse();
+  const maxRev = Math.max(...revenueData.map(r => r.rev), 1); // Ensure no divide by zero
+
+
+  const totalRevenue = allOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
   const totalProducts = products.length;
-  const totalOrders = orders.length + 8; // keeping base for visual
+  const totalOrders = allOrders.length;
   const avgRating = products.length > 0 ? (products.reduce((s, p) => s + p.rating, 0) / products.length).toFixed(1) : 4.5;
 
   const TOP_PRODUCTS = [...products].sort((a, b) => b.review_count - a.review_count).slice(0, 5);
@@ -68,9 +72,11 @@ export default function AdminDashboard() {
         {/* Revenue chart */}
         <div className="glass" style={{ padding: '1.5rem', borderRadius: 'var(--radius)' }}>
           <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📈 Monthly Revenue</h3>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1rem', height: 180 }}>
-            {MOCK_REVENUE.map(r => (
-              <div key={r.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1rem', height: 180, overflowX: 'auto', paddingBottom: '0.5rem' }}>
+            {revenueData.length === 0 ? (
+               <div style={{ flex: 1, textAlign: 'center', color: 'var(--text-muted)' }}>No revenue data yet</div>
+            ) : revenueData.map(r => (
+              <div key={r.month} style={{ flex: 1, minWidth: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                 <div style={{ fontSize: '0.7rem', color: 'var(--neon-cyan)' }}>₹{(r.rev / 1000).toFixed(0)}K</div>
                 <div style={{
                   width: '100%',

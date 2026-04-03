@@ -1,17 +1,31 @@
 'use client';
 import { useCart } from '@/lib/store';
-import { PRODUCTS } from '@/lib/data';
+import { CATEGORIES } from '@/lib/data';
 import ProductCard from '@/components/ProductCard';
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export default function WishlistPage() {
-  const { wishlist, user, loading } = useCart();
+  const { wishlist, user, loading: cartLoading } = useCart();
+  const [wishlistedProducts, setWishlistedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const wishlistedProducts = useMemo(() => {
-    if (!wishlist || wishlist.length === 0) return [];
-    return PRODUCTS.filter(p => wishlist.includes(p.id));
-  }, [wishlist]);
+  useEffect(() => {
+    if (!cartLoading && user && wishlist?.length > 0) {
+      supabase.from('products').select('*').in('id', wishlist).then(({data}) => {
+        if (data) {
+          setWishlistedProducts(data.map(p => ({
+            ...p, originalPrice: p.original_price, image: p.image_url, reviewCount: p.review_count,
+            category: CATEGORIES.find(c => c.id === p.category_id)?.slug || 'wireless'
+          })));
+        }
+        setLoading(cartLoading);
+      });
+    } else {
+      setLoading(cartLoading);
+    }
+  }, [wishlist, user, cartLoading]);
 
   if (loading) {
     return (

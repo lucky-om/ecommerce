@@ -7,7 +7,7 @@ import CartDrawer from './CartDrawer';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { cartCount, user } = useCart();
+  const { cartCount, user, profile } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -41,7 +41,7 @@ export default function Navbar() {
               <>
                 <Link href="/orders" className="btn btn-ghost btn-sm desktop-only">My Orders</Link>
                 <Link href="/wishlist" className="btn btn-ghost btn-sm desktop-only">Wishlist</Link>
-                {user.user_metadata?.role === 'admin' && (
+                {profile?.role === 'admin' && (
                   <Link href="/admin" className="btn btn-ghost btn-sm desktop-only">Admin</Link>
                 )}
                 <a href="/auth/logout" className="btn btn-ghost btn-sm desktop-only">Logout</a>
@@ -71,7 +71,7 @@ export default function Navbar() {
               <>
                  <Link href="/orders" className="btn btn-ghost btn-sm" onClick={() => setMenuOpen(false)}>My Orders</Link>
                  <Link href="/wishlist" className="btn btn-ghost btn-sm" onClick={() => setMenuOpen(false)}>Wishlist</Link>
-                 {user.user_metadata?.role === 'admin' && (
+                 {profile?.role === 'admin' && (
                     <Link href="/admin" className="btn btn-ghost btn-sm" onClick={() => setMenuOpen(false)}>Admin</Link>
                  )}
                  <a href="/auth/logout" className="btn btn-danger btn-sm" onClick={() => setMenuOpen(false)}>Logout</a>

@@ -1,33 +1,50 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatPrice } from '@/lib/data';
+import { supabase } from '@/lib/supabase';
 
 const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 
-const DEMO_ORDERS = [
-  { id: 'SL-12345678', customer: 'Rahul Sharma', email: 'rahul@example.com', amount: 29990, status: 'delivered', date: '2026-03-30', items: [{ name: 'Sony WH-1000XM5', qty: 1 }] },
-  { id: 'SL-87654321', customer: 'Priya Mehta', email: 'priya@example.com', amount: 14999, status: 'shipped', date: '2026-03-31', items: [{ name: 'JBL Quantum 910', qty: 1 }] },
-  { id: 'SL-11223344', customer: 'Arjun Patel', email: 'arjun@example.com', amount: 45000, status: 'processing', date: '2026-04-01', items: [{ name: 'Sennheiser HD 660S2', qty: 1 }] },
-  { id: 'SL-99887766', customer: 'Neha Singh', email: 'neha@example.com', amount: 12990, status: 'pending', date: '2026-04-02', items: [{ name: 'Audio-Technica ATH-M50x', qty: 1 }] },
-  { id: 'SL-55443322', customer: 'Vikram Nair', email: 'vikram@example.com', amount: 59900, status: 'delivered', date: '2026-03-28', items: [{ name: 'Apple AirPods Max', qty: 1 }] },
-  { id: 'SL-33221100', customer: 'Anjali Desai', email: 'anjali@example.com', amount: 19990, status: 'shipped', date: '2026-03-29', items: [{ name: 'Sony WF-1000XM5', qty: 1 }] },
-];
-
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState(DEMO_ORDERS);
+  const [orders, setOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadOrders() {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (!error && data) {
+        setOrders(data);
+      }
+      setLoading(false);
+    }
+    loadOrders();
+  }, []);
 
   const filtered = orders.filter(o =>
     (statusFilter === 'all' || o.status === statusFilter) &&
-    (o.customer.toLowerCase().includes(search.toLowerCase()) || o.id.includes(search))
+    (o.id.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const updateStatus = (id, status) => {
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+  const updateStatus = async (id, status) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ status })
+      .eq('id', id);
+    
+    if (!error) {
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    } else {
+      alert("Failed to update status: " + error.message);
+    }
   };
 
-  const totalRevenue = orders.reduce((s, o) => s + o.amount, 0);
+  const totalRevenue = orders.reduce((s, o) => s + (o.total_amount || 0), 0);
 
   return (
     <div>
@@ -58,19 +75,19 @@ export default function AdminOrdersPage() {
           <tbody>
             {filtered.map(o => (
               <tr key={o.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                <td style={{ padding: '0.9rem 1rem', fontFamily: 'Orbitron, sans-serif', fontSize: '0.78rem', color: 'var(--neon-cyan)' }}>{o.id}</td>
+                <td style={{ padding: '0.9rem 1rem', fontFamily: 'Orbitron, sans-serif', fontSize: '0.78rem', color: 'var(--neon-cyan)' }}>{o.id.substring(0,8).toUpperCase()}</td>
                 <td style={{ padding: '0.9rem 1rem' }}>
-                  <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{o.customer}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{o.email}</div>
+                  <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>User ID: {o.user_id.substring(0,8)}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{o.email || 'N/A'}</div>
                 </td>
                 <td style={{ padding: '0.9rem 1rem', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                  {o.items?.map(i => i.name).join(', ')}
+                  View Details
                 </td>
-                <td style={{ padding: '0.9rem 1rem', fontWeight: 700, fontSize: '0.875rem' }}>{formatPrice(o.amount)}</td>
+                <td style={{ padding: '0.9rem 1rem', fontWeight: 700, fontSize: '0.875rem' }}>{formatPrice(o.total_amount)}</td>
                 <td style={{ padding: '0.9rem 1rem' }}>
                   <span className={`order-status status-${o.status}`}>{o.status}</span>
                 </td>
-                <td style={{ padding: '0.9rem 1rem', fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{o.date}</td>
+                <td style={{ padding: '0.9rem 1rem', fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{new Date(o.created_at).toLocaleDateString()}</td>
                 <td style={{ padding: '0.9rem 1rem' }}>
                   <select
                     className="sort-select"

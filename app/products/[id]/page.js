@@ -7,9 +7,7 @@ import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
 import { supabase } from '@/lib/supabase';
 
-const MOCK_REVIEWS = [
-  { id: 1, name: 'Khushi Patel', rating: 5, title: 'Absolutely incredible!', body: 'Best purchase of the year. The sound quality is out of this world. Active noise cancellation is top tier — perfect for my daily commute.', date: '2026-03-15' }
-];
+
 
 function StarRating({ rating, size = 'sm' }) {
   return (
@@ -57,25 +55,30 @@ export default function ProductDetailPage({ params }) {
   const [userRating, setUserRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [reviewTitle, setReviewTitle] = useState('');
-  const [reviews, setReviews] = useState(MOCK_REVIEWS);
+  const [reviews, setReviews] = useState([]);
 
   // Load reviews from Supabase
   useEffect(() => {
-     async function loadRev() {
-       const { supabase } = await import('@/lib/supabase');
-       const { data, error } = await supabase.from('reviews').select('*').eq('product_id', product.id).order('created_at', { ascending: false });
-       if (data && !error && data.length > 0) {
-         setReviews(data.map(r => ({
-           id: r.id, 
-           name: 'Verified Customer',
-           rating: r.rating,
-           title: r.title,
-           body: r.body,
-           date: new Date(r.created_at).toISOString().slice(0, 10)
-         })));
-       }
-     }
-     loadRev();
+    async function loadRev() {
+      if (!product.id) return;
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*, profiles(full_name)')
+        .eq('product_id', product.id)
+        .order('created_at', { ascending: false });
+      
+      if (data && !error && data.length > 0) {
+        setReviews(data.map(r => ({
+          id: r.id, 
+          name: r.profiles?.full_name || 'Verified Customer',
+          rating: r.rating,
+          title: r.title,
+          body: r.body,
+          date: new Date(r.created_at).toISOString().slice(0, 10)
+        })));
+      }
+    }
+    loadRev();
   }, [product.id]);
 
   const discount = product.originalPrice

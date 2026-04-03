@@ -7,6 +7,7 @@ export const metadata = {
   title: 'SoundLux — Premium Headphones Store',
   description: 'Shop the best headphones from Sony, Bose, Apple, JBL, Sennheiser and more. Free shipping on orders above ₹5000.',
   keywords: 'headphones, wireless headphones, noise cancelling, gaming headphones, earbuds, Sony, Bose, Apple AirPods',
+  metadataBase: new URL('https://soundlux.luckyverse.tech'),
   referrer: 'no-referrer',
   openGraph: {
     title: 'SoundLux — Premium Audio',
