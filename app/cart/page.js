@@ -2,13 +2,24 @@
 import { useCart } from '@/lib/store';
 import { formatPrice, COUPONS } from '@/lib/data';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, cartTotal } = useCart();
   const [coupon, setCoupon] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
+  const { user, loading } = useCart();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) return <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>;
 
   const shipping = cartTotal > 5000 ? 0 : 149;
   const tax = Math.round(cartTotal * 0.18);

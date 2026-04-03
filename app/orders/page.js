@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { formatPrice } from '@/lib/data';
+import { useCart } from '@/lib/store';
 import Link from 'next/link';
 
 const STATUS_STEPS = ['pending', 'processing', 'shipped', 'delivered'];
@@ -21,11 +23,35 @@ function OrderTimeline({ status }) {
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
+  const { user, loading } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('soundlux_orders') || '[]');
-    setOrders(stored);
-  }, []);
+    if (!loading && !user) {
+      router.push('/auth/login');
+      return;
+    }
+    if (user) {
+      const fetchOrders = async () => {
+        const { supabase } = await import('@/lib/supabase');
+        const { data } = await supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+        if (data) {
+          // Map DB columns to our frontend expectations
+          const formatted = data.map(o => ({
+            id: o.order_number,
+            items: o.items,
+            total: o.total,
+            status: o.status,
+            date: o.created_at,
+          }));
+          setOrders(formatted);
+        }
+      };
+      fetchOrders();
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) return <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>;
 
   if (orders.length === 0) return (
     <div style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.5rem' }}>

@@ -21,7 +21,7 @@ export default function HomePage() {
                 <span className="gradient-text">Next-Level</span><br />
                 Sound Experience
               </h1>
-              <p>Discover the world's finest headphones from Sony, Bose, Apple, and more. Premium audio, engineered for perfection.</p>
+              <p>Discover the world&apos;s finest headphones from Sony, Bose, Apple, and more. Premium audio, engineered for perfection.</p>
               <div className="hero-actions">
                 <Link href="/products" className="btn btn-primary btn-lg" id="hero-shop-btn">
                   🎧 Shop Now

@@ -24,13 +24,7 @@ export default function LoginPage() {
     }
   };
 
-  // Demo login
-  const demoLogin = async () => {
-    setLoading(true); setError('');
-    // Simulate login for demo purposes
-    localStorage.setItem('demo_user', JSON.stringify({ email: 'demo@soundlux.com', name: 'Demo User' }));
-    router.push('/');
-  };
+
 
   return (
     <div className="auth-page">
@@ -64,18 +58,14 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="auth-divider" style={{ margin: '1.25rem 0' }}>— or —</div>
 
-        <button className="btn btn-ghost btn-full" onClick={demoLogin} id="demo-login-btn">
-          🎧 Continue as Demo User
-        </button>
 
         <p className="auth-link-text">
-          Don't have an account? <Link href="/auth/signup">Sign up free →</Link>
+          Don&apos;t have an account? <Link href="/auth/signup">Sign up free →</Link>
         </p>
 
         <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(0,212,255,0.05)', borderRadius: 8, border: '1px solid rgba(0,212,255,0.15)', fontSize: '0.78rem', color: 'var(--text-muted)', textAlign: 'center' }}>
-          🔒 Secured by Supabase Auth. For admin access, set role='admin' in profiles table.
+          🔒 Secured by Supabase Auth. For admin access, set role=&apos;admin&apos; in profiles table.
         </div>
       </div>
     </div>

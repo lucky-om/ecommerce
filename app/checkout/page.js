@@ -1,7 +1,8 @@
 'use client';
 import { useCart } from '@/lib/store';
 import { formatPrice, COUPONS } from '@/lib/data';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -12,12 +13,22 @@ export default function CheckoutPage() {
   const [coupon, setCoupon] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
+  const { user, loading } = useCart();
+  const router = useRouter();
 
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '', phone: '',
     address: '', city: '', state: '', pincode: '', country: 'India',
   });
   const [payMethod, setPayMethod] = useState('dummy');
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) return <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>;
 
   const shipping = cartTotal > 5000 ? 0 : 149;
   const tax = Math.round(cartTotal * 0.18);
@@ -35,23 +46,40 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async () => {
     setProcessing(true);
-    // Simulate payment processing
-    await new Promise(r => setTimeout(r, 2000));
     const newOrderId = 'SL-' + Date.now().toString().slice(-8);
     setOrderId(newOrderId);
 
-    // Save to localStorage for orders page
-    const orders = JSON.parse(localStorage.getItem('soundlux_orders') || '[]');
-    orders.unshift({
-      id: newOrderId, items: cart, total,
-      status: 'processing', date: new Date().toISOString(),
-      address: form, paymentMethod: payMethod,
-    });
-    localStorage.setItem('soundlux_orders', JSON.stringify(orders));
+    try {
+      const { supabase } = await import('@/lib/supabase');
+      const { error } = await supabase.from('orders').insert({
+        order_number: newOrderId,
+        user_id: user.id,
+        items: cart,
+        subtotal: cartTotal,
+        shipping,
+        tax,
+        discount,
+        total,
+        status: 'processing',
+        shipping_address: form,
+        payment_method: payMethod,
+        coupon_code: appliedCoupon ? appliedCoupon.code : null,
+      });
 
-    clearCart();
-    setProcessing(false);
-    setStep(3);
+      if (error) {
+         console.error(error);
+         alert('Order could not be placed due to an error.');
+         setProcessing(false);
+         return;
+      }
+
+      clearCart();
+      setProcessing(false);
+      setStep(3);
+    } catch (err) {
+      console.error(err);
+      setProcessing(false);
+    }
   };
 
   if (cart.length === 0 && step !== 3) return (
@@ -71,7 +99,7 @@ export default function CheckoutPage() {
         <div style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Order ID: <strong style={{ color: 'var(--neon-cyan)' }}>{orderId}</strong></div>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.7, marginTop: '0.75rem' }}>
           🎧 Your headphones are being packed!<br />
-          You'll receive a confirmation soon.
+          You&apos;ll receive a confirmation soon.
         </p>
         <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/orders" className="btn btn-primary">Track Order</Link>

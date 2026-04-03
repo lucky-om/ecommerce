@@ -37,7 +37,7 @@ export default function SignupPage() {
         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📧</div>
         <h2 style={{ fontFamily: 'Orbitron, sans-serif', marginBottom: '0.75rem', color: 'var(--neon-green)' }}>Check Your Email!</h2>
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-          We've sent a confirmation link to <strong style={{ color: 'var(--neon-cyan)' }}>{form.email}</strong>.<br />
+          We&apos;ve sent a confirmation link to <strong style={{ color: 'var(--neon-cyan)' }}>{form.email}</strong>.<br />
           Click the link to activate your account.
         </p>
         <Link href="/auth/login" className="btn btn-primary btn-full">Go to Login →</Link>
