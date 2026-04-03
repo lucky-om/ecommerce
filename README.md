@@ -1,7 +1,5 @@
 # SoundLux — Premium Audio E-Commerce Platform
 
-![SoundLux Preview](public/images/og-preview.png)
-
 SoundLux is a state-of-the-art e-commerce platform designed for the **INFERNO'26 : HACKOVERFLOW** hackathon. It offers a premium, high-performance shopping experience for audiophiles, featuring a curated selection of world-class headphones and audio equipment.
 
 Developed with a focus on modern aesthetics, real-time data synchronization, and robust security, SoundLux represents the future of specialized retail platforms.
